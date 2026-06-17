@@ -86,20 +86,25 @@ PYBIND11_MODULE(wisardpkg, m){
     ;
 
     py::class_<ClusWisardWrapper>(m, "ClusWisard")
-      .def(py::init<std::string>())
-      .def(py::init<int, float, int, int, py::kwargs>())
-      .def("train", (void (ClusWisardWrapper::*)(const std::vector<std::vector<int>>&, const std::vector<std::string>&)) &ClusWisardWrapper::train)
-      .def("train", (void (ClusWisardWrapper::*)(const std::vector<std::vector<int>>&, std::map<int, std::string>&)) &ClusWisardWrapper::train)
-      .def("trainUnsupervised", &ClusWisardWrapper::trainUnsupervised)
-      .def("classify", (py::list (ClusWisardWrapper::*)(const std::vector<std::vector<int>>&)) &ClusWisardWrapper::pyClassify)
-      .def("classifyUnsupervised", (std::vector<std::string> (ClusWisardWrapper::*)(const std::vector<std::vector<int>>&)) &ClusWisardWrapper::classifyUnsupervised)
-      .def("getMentalImage", &ClusWisardWrapper::getMentalImage)
-      .def("getMentalImages", &ClusWisardWrapper::getMentalImages)
-      .def("jsonConfig", &ClusWisardWrapper::jsonConfig)
-      .def("json", (std::string (ClusWisardWrapper::*)()) &ClusWisardWrapper::json)
-      .def("json", (std::string (ClusWisardWrapper::*)(bool)) &ClusWisardWrapper::json)
-      .def("json", (std::string (ClusWisardWrapper::*)(bool,std::string)) &ClusWisardWrapper::json)
-      .def("getsizeof", &ClusWisardWrapper::getsizeof)
-    ;
+
+    .def(py::init<int, float, int, int, int, py::kwargs>(),
+         py::arg("addressSize"),
+         py::arg("minScore"),
+         py::arg("threshold"),
+         py::arg("discriminatorsLimit"),
+         py::arg("seed") = 42)
+
+    .def("train", (void (ClusWisardWrapper::*)(const std::vector<std::vector<int>>&, const std::vector<std::string>&)) &ClusWisardWrapper::train)
+    .def("train", (void (ClusWisardWrapper::*)(const std::vector<std::vector<int>>&, std::map<int, std::string>&)) &ClusWisardWrapper::train)
+    .def("trainUnsupervised", &ClusWisardWrapper::trainUnsupervised)
+    .def("classify", (py::list (ClusWisardWrapper::*)(const std::vector<std::vector<int>>&)) &ClusWisardWrapper::pyClassify)
+    .def("classifyUnsupervised", (std::vector<std::string> (ClusWisardWrapper::*)(const std::vector<std::vector<int>>&)) &ClusWisardWrapper::classifyUnsupervised)
+    .def("getMentalImage", &ClusWisardWrapper::getMentalImage)
+    .def("getMentalImages", &ClusWisardWrapper::getMentalImages)
+    .def("jsonConfig", &ClusWisardWrapper::jsonConfig)
+    .def("json", (std::string (ClusWisardWrapper::*)()) &ClusWisardWrapper::json)
+    .def("json", (std::string (ClusWisardWrapper::*)(bool)) &ClusWisardWrapper::json)
+    .def("json", (std::string (ClusWisardWrapper::*)(bool,std::string)) &ClusWisardWrapper::json)
+    .def("getsizeof", &ClusWisardWrapper::getsizeof);
 
 }

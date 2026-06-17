@@ -1,13 +1,16 @@
-
 class ClusWisard{
 public:
-  ClusWisard(int addressSize, float minScore, int threshold, int discriminatorsLimit):
-    ClusWisard(addressSize, minScore, threshold, discriminatorsLimit, {})
+  // Construtor padrão com seed (default = 42)
+  ClusWisard(int addressSize, float minScore, int threshold, int discriminatorsLimit, int seed = 42)
+    : ClusWisard(addressSize, minScore, threshold, discriminatorsLimit, {}, seed)
   {}
-  ClusWisard(int addressSize, float minScore, int threshold, int discriminatorsLimit, nl::json options):
-    addressSize(addressSize), minScore(minScore), threshold(threshold), discriminatorsLimit(discriminatorsLimit)
+
+  // Construtor com options + seed
+  ClusWisard(int addressSize, float minScore, int threshold, int discriminatorsLimit, nl::json options, int seed = 42)
+    : addressSize(addressSize), minScore(minScore), threshold(threshold), discriminatorsLimit(discriminatorsLimit)
   {
-    srand(randint(0,1000000));
+    srand(seed);  // 🔥 agora parametrizado
+
     nl::json value;
 
     value = options["bleachingActivated"];
@@ -42,37 +45,41 @@ public:
 
     checkConfigInputs(minScore, threshold, discriminatorsLimit);
   }
-  ClusWisard(std::string config):ClusWisard(0,0,1,1,nl::json::parse(config)){
-      nl::json c = nl::json::parse(config);
-      addressSize = c["addressSize"];
-      minScore = c["minScore"];
-      threshold = c["threshold"];
-      discriminatorsLimit = c["discriminatorsLimit"];
 
-      nl::json dConfig = {
-        {"addressSize", addressSize},
-        {"minScore", minScore},
-        {"threshold", threshold},
-        {"discriminatorsLimit", discriminatorsLimit},
-        {"completeAddressing", completeAddressing},
-        {"ignoreZero", ignoreZero},
-        {"base", base}
-      };
+  // Construtor via config + seed
+  ClusWisard(std::string config, int seed = 42)
+    : ClusWisard(0, 0, 1, 1, nl::json::parse(config), seed)
+  {
+    nl::json c = nl::json::parse(config);
+    addressSize = c["addressSize"];
+    minScore = c["minScore"];
+    threshold = c["threshold"];
+    discriminatorsLimit = c["discriminatorsLimit"];
 
-      nl::json classes = c["clusters"];
-      if(!classes.is_null()){
-        for(nl::json::iterator it = classes.begin(); it != classes.end(); ++it){
-          nl::json d = it.value();
-          d.merge_patch(dConfig);
-          clusters[it.key()] = Cluster(d);
-        }
+    nl::json dConfig = {
+      {"addressSize", addressSize},
+      {"minScore", minScore},
+      {"threshold", threshold},
+      {"discriminatorsLimit", discriminatorsLimit},
+      {"completeAddressing", completeAddressing},
+      {"ignoreZero", ignoreZero},
+      {"base", base}
+    };
+
+    nl::json classes = c["clusters"];
+    if(!classes.is_null()){
+      for(nl::json::iterator it = classes.begin(); it != classes.end(); ++it){
+        nl::json d = it.value();
+        d.merge_patch(dConfig);
+        clusters[it.key()] = Cluster(d);
       }
+    }
 
-      nl::json unsupervisedConfig = c["unsupervisedCluster"];
-      if(!unsupervisedConfig.is_null()){
-        unsupervisedConfig.merge_patch(dConfig);
-        unsupervisedCluster = Cluster(unsupervisedConfig);
-      }
+    nl::json unsupervisedConfig = c["unsupervisedCluster"];
+    if(!unsupervisedConfig.is_null()){
+      unsupervisedConfig.merge_patch(dConfig);
+      unsupervisedCluster = Cluster(unsupervisedConfig);
+    }
   }
 
 
